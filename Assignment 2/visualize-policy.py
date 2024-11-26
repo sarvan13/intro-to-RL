@@ -40,14 +40,19 @@ def plot_training_error(training_error, title):
       plt.title(title)
       plt.show()
 
-with open('q_learning_model_7.json', 'rb') as f:
+
+
+json_file = 'dyna_q_test.json'
+np_file = 'dyna_q_test.npy'
+
+with open(json_file, 'rb') as f:
      policy_json = json.load(f)
 
 context = {"np": np}
 
 policy = {eval(k, context): Actions(v) for k, v in policy_json.items()}
 
-rewards = np.load('q_learning_rewards_7.npy')
+rewards = np.load(np_file)
 
-visualizePolicy(policy, "Q-learning policy")
+visualizePolicy(policy, "Dyna-Q policy")
 plot_training_error(rewards, "Cumulative Reward")
