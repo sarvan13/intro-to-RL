@@ -34,16 +34,20 @@ def visualizePolicy(policy, title):
         plt.title(title)
         plt.show()
 
-def plot_training_error(training_error, title):
-      error = [training_error[i] for i in range(int(len(training_error) / 10))]
-      plt.plot(error)
+def plot_training_error(training_error, label, title):
+      error = [training_error[i] for i in range(int(len(training_error)))]
+      plt.plot(error, label=label)
+      plt.axvline(x=500_000,color = 'b', linestyle='--')
+      plt.axvline(x=1_500_000,color = 'b', linestyle='--')
+      plt.axvline(x=3_000_000,color = 'b',  linestyle='--')
+      plt.xlabel("Number of Steps")
+      plt.ylabel("Cumulative Reward")
       plt.title(title)
-      plt.show()
 
 
 
-json_file = 'dyna_q_test.json'
-np_file = 'dyna_q_test.npy'
+json_file = 'dyna_q_decay_50_a01.json'
+np_file = 'dyna_q_decay_50_a01.npy'
 
 with open(json_file, 'rb') as f:
      policy_json = json.load(f)
@@ -55,4 +59,9 @@ policy = {eval(k, context): Actions(v) for k, v in policy_json.items()}
 rewards = np.load(np_file)
 
 visualizePolicy(policy, "Dyna-Q policy")
-plot_training_error(rewards, "Cumulative Reward")
+#plot_training_error(rewards, "epsilon = 0.25", "Q Learning in Grid World (alpha = 0.001)")
+
+# rewards2 = np.load('q_learning_rewards_7.npy')
+# plt.plot(rewards2, label="Decaying epsilon 1-0.1")
+# plt.legend(loc="upper left")
+# plt.show()

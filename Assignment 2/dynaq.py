@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-import matplotlib.pyplot as plt
 import numpy as np
 import random
 from enum import Enum
@@ -113,8 +112,13 @@ class DynaQAgent:
         self.total_reward.append(self.reward_sum)
     
     def extract_state_value(self,key):
-        string_split = key.split(")), ")
-        obs_string = string_split[0][1:] + "))"
+        if (np.version.version == "1.26.4"):
+            string_split = key.split("), ")
+            obs_string = string_split[0][1:] + ")"
+        else:
+            string_split = key.split(")), ")
+            obs_string = string_split[0][1:] + "))"
+
         reward_string = string_split[1][:-1]
 
         context = {"np": np}
@@ -130,11 +134,11 @@ class DynaQAgent:
 
 env = gym.make("gymnasium_env/GridWorld-v0")
 
-learning_rate = 0.001
-n_episodes = 1_000_000
+learning_rate = 0.01
+n_steps = 50_000_000
 start_epsilon = 0.25
-epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
-final_epsilon = 0.25
+epsilon_decay = (start_epsilon) / (n_steps/2)  # reduce the exploration over time
+final_epsilon = 0.1
 
 agent = DynaQAgent(
     env=env,
@@ -144,22 +148,22 @@ agent = DynaQAgent(
     epsilon_decay=epsilon_decay,
     final_epsilon=final_epsilon,
 )
+done = True
 
-for episode in tqdm(range(n_episodes)):
-    obs, info = env.reset()
-    done = False
+for step in tqdm(range(n_steps)):
+    if done:
+        obs, info = env.reset()
+        done = False
 
-    # play one episode
-    while not done:
-        action = agent.get_action(env, obs)
-        next_obs, reward, terminated, truncated, info = env.step(action)
+    action = agent.get_action(env, obs)
+    next_obs, reward, terminated, truncated, info = env.step(action)
 
-        # update the agent
-        agent.update(obs, action, reward, terminated, next_obs)
+    # update the agent
+    agent.update(obs, action, reward, terminated, next_obs)
 
-        # update if the environment is done and the current obs
-        done = terminated or truncated
-        obs = next_obs
+    # update if the environment is done and the current obs
+    done = terminated or truncated
+    obs = next_obs
 
     #agent.decay_epsilon()
 
@@ -168,7 +172,7 @@ q_values = agent.q_values
 policy = {state:Actions(np.argmax(q_values[state])) for state in q_values}
 
 
-with open('dyna_q_test.json', 'w') as f:
+with open('dyna_q_const_50_a01.json', 'w') as f:
      json.dump({str(key):policy[key].value for key in policy}, f)
 
-np.save("dyna_q_test.npy", np.array(agent.total_reward))
+np.save("dyna_q_const_50_a01.npy", np.array(agent.total_reward))
