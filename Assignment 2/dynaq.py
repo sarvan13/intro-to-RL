@@ -136,7 +136,7 @@ env = gym.make("gymnasium_env/GridWorld-v0")
 
 learning_rate = 0.01
 n_steps = 50_000_000
-start_epsilon = 0.25
+start_epsilon = 0.3
 epsilon_decay = (start_epsilon) / (n_steps/2)  # reduce the exploration over time
 final_epsilon = 0.1
 
@@ -172,7 +172,7 @@ q_values = agent.q_values
 policy = {state:Actions(np.argmax(q_values[state])) for state in q_values}
 
 
-with open('dyna_q_const_50_a01.json', 'w') as f:
+with open('dyna_q_const03_50_a01.json', 'w') as f:
      json.dump({str(key):policy[key].value for key in policy}, f)
 
-np.save("dyna_q_const_50_a01.npy", np.array(agent.total_reward))
+np.save("dyna_q_const03_50_a01.npy", np.array(agent.total_reward))

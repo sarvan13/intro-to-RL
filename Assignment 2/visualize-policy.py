@@ -46,8 +46,7 @@ def plot_training_error(training_error, label, title):
 
 
 
-json_file = 'dyna_q_decay_50_a01.json'
-np_file = 'dyna_q_decay_50_a01.npy'
+json_file = 'q_learning_step_55.json'
 
 with open(json_file, 'rb') as f:
      policy_json = json.load(f)
@@ -56,12 +55,41 @@ context = {"np": np}
 
 policy = {eval(k, context): Actions(v) for k, v in policy_json.items()}
 
-rewards = np.load(np_file)
 
-visualizePolicy(policy, "Dyna-Q policy")
-#plot_training_error(rewards, "epsilon = 0.25", "Q Learning in Grid World (alpha = 0.001)")
 
-# rewards2 = np.load('q_learning_rewards_7.npy')
-# plt.plot(rewards2, label="Decaying epsilon 1-0.1")
+visualizePolicy(policy, "Q Learning Policy Epsilon = 0.25, Alpha = 0.001")
+# rewards = np.load('dyna_q_decay_50_a01.npy')
+# plot_training_error(rewards[:8_000_000], "Decaying Epsilon, alpha = 0.01", "Dyna Q in Grid World")
+
+# rewards2 = np.load('dyna_q_const_50_a01.npy')
+# plt.plot(rewards2[:8_000_000], label="Random Start Epsilon =  0.25, alpha = 0.01")
+
+# rewards4 = np.load('dyna_q_const02_50_a01.npy')
+# plt.plot(rewards4[:8_000_000], label="Random Start Epsilon =  0.20, alpha = 0.01")
+
+# rewards5 = np.load('dyna_q_const03_50_a01.npy')
+# plt.plot(rewards5[:8_000_000], label="Epsilon =  0.30, alpha = 0.01")
+
+# rewards3 = np.load('dyna_q_step_const_start.npy')
+# plt.plot(rewards3, label="Epsilon =  0.25, alpha = 0.001")
+
+# rewardsw = np.load('dyna_q_const_start_50_a01.npy')
+# plt.plot(rewardsw, label="Epsilon = 0.25, alpha = 0.01")
+
 # plt.legend(loc="upper left")
 # plt.show()
+# 
+
+
+# q_learning_reward = np.load('q_learning_rewards_7.npy')
+# plot_training_error(q_learning_reward, "Q Learning epsilon decay, alpha=0.001", "Q Learning vs Dyna Q")
+
+# plt.plot(rewards, label="Dyna Q Decaying Epsilon, alpha = 0.01")
+# plt.plot(rewards3, label="Dyna Q Epsilon =  0.25, alpha = 0.001")
+
+# q_learning_reward2 = np.load('q_learning_step_55.npy')
+# plt.plot(q_learning_reward2, label="Q Learning Epsilon = 0.25, alpha=0.001")
+
+# plt.legend(loc="upper left")
+# plt.show()
+
