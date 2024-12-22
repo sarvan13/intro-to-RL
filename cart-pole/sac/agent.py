@@ -80,17 +80,17 @@ class SACAgent():
         # error = log(pi(a|s)) - q(s,a)
         sampled_actions, log_probs = self.actor.sample(states, reparameterize=True)
         q_actor = self.q.forward(states, sampled_actions)
-        actor_loss = 0.5*self.loss(log_probs, q_actor)
+        actor_loss = ((log_probs.view(-1) - q_actor.detach())).mean()
         self.actor.optimizer.zero_grad()
         actor_loss.backward()
         self.actor.optimizer.step()
 
         # Train Q Network
         # error = Q(s,a) - (r(s,a) + gamma* E(V'(s)))
-        q = self.q.forward(states, actions)
-        next_value = self.value_target.forward(next_states)
-        next_value = (1 - dones).view(-1,1) * next_value
-        q_target = self.rewards_scale*rewards.view(-1, 1) + self.gamma * next_value
+        q = self.q.forward(states, actions).view(-1)
+        next_value = self.value_target.forward(next_states).view(-1)
+        next_value = (1 - dones).view(-1) * next_value
+        q_target = self.rewards_scale*rewards.view(-1) + self.gamma * next_value
         q_loss = 0.5*self.loss(q,q_target.detach())
         self.q.optimizer.zero_grad()
         q_loss.backward()

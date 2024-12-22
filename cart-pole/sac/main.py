@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # Training Loop
 
-def train_sac(env_name='InvertedPendulum-v5', episodes=2000, batch_size=256):
+def train_sac(env_name='InvertedPendulum-v5', episodes=500, batch_size=256):
 
     env = gym.make(env_name)
 
