@@ -88,8 +88,8 @@ class DQNAgent:
         self.q_network.eval()
 
 # Main training loop
-def train_dqn(env_name='CartPole-v1', episodes=500, batch_size=64, save_path='dqn_cartpole.pth'):
-    env = gym.make(env_name, render_mode="human")
+def train_dqn(env_name='CartPole-v1', episodes=350, batch_size=64, save_path='dqn_cartpole.pth'):
+    env = gym.make(env_name)
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)
@@ -99,6 +99,7 @@ def train_dqn(env_name='CartPole-v1', episodes=500, batch_size=64, save_path='dq
         state, _ = env.reset()
         total_reward = 0
         done = False
+        step_count = 0
 
         while not done:
             action = agent.act(state)
@@ -108,6 +109,10 @@ def train_dqn(env_name='CartPole-v1', episodes=500, batch_size=64, save_path='dq
             total_reward += reward
 
             agent.replay(batch_size)
+            step_count += 1
+
+            if step_count > 5_000:
+                done = True
 
         rewards.append(total_reward)
         agent.update_target_network()
@@ -123,5 +128,7 @@ def train_dqn(env_name='CartPole-v1', episodes=500, batch_size=64, save_path='dq
     plt.ylabel('Total Reward')
     plt.title('Training Progress')
     plt.show()
+
+    np.save("dqn-full-1.npy", np.array(rewards))
 
 train_dqn()

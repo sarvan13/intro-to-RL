@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # Training Loop
 
-def train_sac(env_name='InvertedPendulum-v5', episodes=2000, batch_size=256):
+def train_sac(env_name='InvertedPendulum-v5', episodes=350, batch_size=256):
 
     env = gym.make(env_name)
 
@@ -34,8 +34,12 @@ def train_sac(env_name='InvertedPendulum-v5', episodes=2000, batch_size=256):
             agent.train(batch_size)
             step_count += 1
 
-            if step_count > 1500:
-                done = True
+            if step_count > 5_000:
+                if episode < episodes - 1:
+                    done = True
+                # Test to see how long the last episode runs for
+                elif step_count > 50_000:
+                    done = True
 
         print(f"Episode {episode+1}/{episodes}, Total Reward: {total_reward}")
         reward_arr.append(total_reward)
@@ -43,7 +47,7 @@ def train_sac(env_name='InvertedPendulum-v5', episodes=2000, batch_size=256):
     env.close()
     plt.plot(reward_arr)
     plt.show()
-    np.save("sac-v2.npy", np.array(reward_arr))
+    np.save("sac-full-idk.npy", np.array(reward_arr))
     
 
 
