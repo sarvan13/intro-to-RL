@@ -67,33 +67,34 @@ class SACAgent():
 
         # Train Value Network
         # error = V(s) - E(Q(s,a) - log(pi(a|s)))
+        self.value.optimizer.zero_grad()
+        v = self.value.forward(states).view(-1)
         sampled_actions, log_probs = self.actor.sample(states, reparameterize=False)
         q_v = self.q.forward(states, sampled_actions).view(-1)
-        v = self.value.forward(states).view(-1)
         target_v = q_v - log_probs.view(-1)
-        v_loss = 0.5*self.loss(v, target_v)
-        self.value.optimizer.zero_grad()
-        v_loss.backward(retain_graph=True)
+        v_loss = 0.5*self.loss(v, target_v.detach())
+        v_loss.backward()
         self.value.optimizer.step()
 
         #Train Actor Network
         # error = log(pi(a|s)) - q(s,a)
+        self.actor.optimizer.zero_grad()
         sampled_actions, log_probs = self.actor.sample(states, reparameterize=True)
         q_actor = self.q.forward(states, sampled_actions).view(-1)
         actor_loss = (log_probs.view(-1) - q_actor).mean()
-        self.actor.optimizer.zero_grad()
-        actor_loss.backward(retain_graph=True)
+        actor_loss.backward()
         self.actor.optimizer.step()
 
         # Train Q Network
         # error = Q(s,a) - (r(s,a) + gamma* E(V'(s)))
+        self.q.optimizer.zero_grad()
         q = self.q.forward(states, actions).view(-1)
         next_value = self.value_target.forward(next_states).view(-1)
         next_value = (1 - dones).view(-1) * next_value
         q_target = self.rewards_scale*rewards.view(-1) + self.gamma * next_value
-        q_loss = 0.5*self.loss(q,q_target)
-        self.q.optimizer.zero_grad()
-        q_loss.backward(retain_graph=True)
+        q_loss = 0.5*self.loss(q,q_target.detach())
+
+        q_loss.backward()
         self.q.optimizer.step()
 
         # Update V Target Network

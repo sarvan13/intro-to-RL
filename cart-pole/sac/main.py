@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def train_sac(env_name='InvertedPendulum-v5', episodes=350, batch_size=256):
 
-    env = gym.make(env_name)
+    env = gym.make(env_name, render_mode='human')
 
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0]
@@ -47,7 +47,7 @@ def train_sac(env_name='InvertedPendulum-v5', episodes=350, batch_size=256):
     env.close()
     plt.plot(reward_arr)
     plt.show()
-    np.save("sac-full-idk.npy", np.array(reward_arr))
+    np.save("sac-full-test.npy", np.array(reward_arr))
     
 
 
